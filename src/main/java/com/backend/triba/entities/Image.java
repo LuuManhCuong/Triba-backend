@@ -1,4 +1,4 @@
-package com.backend.triba.model;
+package com.backend.triba.entities;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -10,15 +10,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-@Data
 @Entity
-public class Search {
+@Data
+public class Image {
 	@Id
 	@Column( unique = true, updatable = true)
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID searchId;
-	private UUID userId;
-	@Column(columnDefinition = "nvarchar(255)")
-	private String content;
-	private LocalDate createAt;
+	private UUID imageId;
+	private UUID ownerId;
+	@Column(columnDefinition = "ntext")
+	private String description;
+	private String url;
+
 }

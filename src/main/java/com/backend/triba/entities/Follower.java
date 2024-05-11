@@ -1,4 +1,4 @@
-package com.backend.triba.model;
+package com.backend.triba.entities;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -12,16 +12,13 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Comment {
+public class Follower {
 	@Id
 	@Column( unique = true, updatable = true)
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID commentId;
-	private UUID ownerId;
+	private UUID id;
 	private UUID userId;
-	@Column(columnDefinition = "ntext")
-	private String comment;
-	private LocalDate createdAt;
-	private LocalDate updatedAt;
+	private UUID followerId;
+	private LocalDate followAt;
 
 }

@@ -1,6 +1,5 @@
-package com.backend.triba.model;
+package com.backend.triba.entities;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -12,13 +11,12 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Following {
+public class Category {
 	@Id
 	@Column( unique = true, updatable = true)
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	private UUID userId;
-	private UUID followingId;
-	private LocalDate followAt;
-
+	private UUID categoryId;
+	private UUID jobId;
+	@Column(columnDefinition = "nvarchar(255)")
+	private String name;
 }

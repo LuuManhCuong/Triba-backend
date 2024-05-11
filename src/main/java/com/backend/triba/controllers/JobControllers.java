@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.triba.model.Job;
+import com.backend.triba.entities.Job;
 import com.backend.triba.repository.JobRepository;
 import com.backend.triba.service.JobService;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/v1/triba/job")
+@RequestMapping("/api/v1/user/triba/job")
 public class JobControllers {
 	@Autowired
 	private JobRepository jobRepository;

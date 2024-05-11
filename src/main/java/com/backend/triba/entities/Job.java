@@ -1,4 +1,4 @@
-package com.backend.triba.model;
+package com.backend.triba.entities;
 
 import java.time.LocalDate;
 import java.util.UUID;

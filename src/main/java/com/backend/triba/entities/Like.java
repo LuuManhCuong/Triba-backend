@@ -1,4 +1,4 @@
-package com.backend.triba.model;
+package com.backend.triba.entities;
 
 import java.util.UUID;
 
@@ -7,16 +7,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
-public class Category {
+@Table(name = "[like]")
+public class Like {
 	@Id
 	@Column( unique = true, updatable = true)
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID categoryId;
-	private UUID jobId;
-	@Column(columnDefinition = "nvarchar(255)")
-	private String name;
+	private UUID likeId;
+	private UUID ownerId;
+	private UUID userId;
 }
