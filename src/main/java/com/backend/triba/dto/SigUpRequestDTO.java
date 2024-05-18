@@ -1,5 +1,7 @@
 package com.backend.triba.dto;
 
+import com.backend.triba.enums.Roles;
+
 import lombok.Data;
 
 @Data

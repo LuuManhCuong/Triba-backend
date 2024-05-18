@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.backend.triba.enums.Roles;
 import com.backend.triba.exception.AccessDeniedExceptionHandler;
 import com.backend.triba.exception.AuthenticationExceptionHandler;
 import com.backend.triba.service.UserServiceImpl;
@@ -33,8 +34,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfiguration {
 
     private final UserServiceImpl userService;
-    private static final String[] WHITE_LIST_URL = {"/**", "/api/v1/auth/**", "/api/v1/stayeasy/**", "/api/v1/user/**"};
-    private static final String[] ADMIN_LIST_URL = {"/api/v1/token/**", "/api/v1/stayeasy/admin/**"};
+    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/**", "/api/v1/user/**", "/api"};
+    private static final String[] ADMIN_LIST_URL = {"/api/v1/token/**", "/api/v1/admin/**"};
     private final JwtAuthenticationFilter jwtAuthFilter;
 
     @Bean
@@ -43,7 +44,7 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(
                 req -> req.requestMatchers(WHITE_LIST_URL).permitAll()
                     .requestMatchers("/api/v1/owner/**").hasAnyRole("HOST")
-                    .requestMatchers(ADMIN_LIST_URL).hasAnyRole("ADMIN")
+                    .requestMatchers(ADMIN_LIST_URL).hasAnyAuthority(Roles.ADMIN.name())
                     .anyRequest().authenticated())
             .exceptionHandling(configurer -> configurer
                 .accessDeniedHandler(new AccessDeniedExceptionHandler())

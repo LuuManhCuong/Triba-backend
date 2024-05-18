@@ -25,14 +25,21 @@ public class TribaApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		User adminAccount = userRepository.findByRole(Roles.ADMIN);
 		if(adminAccount== null) {
-			User user = new User();
-			user.setEmail("admin@gmail.com");
-			user.setFirstName("admin");
-			user.setLastName("admin");
-			user.setPassword(new BCryptPasswordEncoder().encode("admin"));
-			user.setRole(Roles.ADMIN);
+//			User user = new User();
+//			user.setEmail("admin@gmail.com");
+//			user.setFirstName("admin");
+//			user.setLastName("admin");
+//			user.setPassword(new BCryptPasswordEncoder().encode("admin"));
+//			user.setRole(Roles.ADMIN);
 			
-			userRepository.save(user);
+			userRepository.save(User.builder()
+					.email("admin@gmail.com")
+					.firstName("admin")
+					.lastName("admin")
+					.password(new BCryptPasswordEncoder().encode("admin"))
+					.role(Roles.ADMIN)
+					.build()
+					);
 		}
 		
 	}

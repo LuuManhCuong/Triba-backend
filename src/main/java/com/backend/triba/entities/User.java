@@ -1,6 +1,8 @@
 package com.backend.triba.entities;
 
 import java.time.LocalDate;
+
+
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -11,17 +13,28 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.backend.triba.enums.Roles;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "[user]")
 public class User implements UserDetails{
 	@Id
@@ -58,6 +71,13 @@ public class User implements UserDetails{
 	private LocalDate createAt;
 	private LocalDate updatateAt;
 	
+	@OneToMany(mappedBy = "user" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Job> jobs;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL , fetch = FetchType.LAZY)
+	private List<Token> tokens;
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -94,4 +114,17 @@ public class User implements UserDetails{
 		// TODO Auto-generated method stub
 		return true;
 	}
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", role=" + role + ", gender=" + gender + ", education=" + education + ", experience=" + experience
+				+ ", skill=" + skill + ", avatar=" + avatar + ", phoneNumber=" + phoneNumber + ", point=" + point
+				+ ", coverImg=" + coverImg + ", sologan=" + sologan + ", address=" + address + ", scale=" + scale
+				+ ", industry=" + industry + ", website=" + website + ", taxCode=" + taxCode + ", createAt=" + createAt
+				+ ", updatateAt=" + updatateAt + "]";
+	}
+
+	
+
+	
 }
