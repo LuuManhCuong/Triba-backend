@@ -1,25 +1,29 @@
 package com.backend.triba.entities;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
-@Entity
 @Data
+@Entity
 public class Image {
-	@Id
-	@Column( unique = true, updatable = true)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID imageId;
-	private UUID ownerId;
-	@Column(columnDefinition = "ntext")
-	private String description;
-	private String url;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID imageId;
+
+    @Column(columnDefinition = "ntext")
+    private String url;
+
+    @Column(columnDefinition = "nvarchar(255)")
+    private String name;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinColumn(name = "job_id")
+    private Job job;
+
 
 }

@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import com.backend.triba.entities.Image;
+
 import lombok.Data;
 
 @Data
@@ -24,8 +26,9 @@ public class JobDTO {
     private LocalDate updateAt;
     private LocalDate deadline;
     private String hastag;
-    private List<Long> industryIds;
-    private List<Long> positionIds;
-    private List<Long> locationIds;
-    private List<Long> workTypeIds;
+    private List<String> industries;
+    private List<String> positions;
+    private List<String> locations;
+    private List<String> workTypes;
+    private List<String> images;
 }

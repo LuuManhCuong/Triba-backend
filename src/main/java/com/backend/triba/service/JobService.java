@@ -1,19 +1,27 @@
 package com.backend.triba.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.backend.triba.dto.JobDTO;
+import com.backend.triba.entities.Image;
 import com.backend.triba.entities.Industry;
 import com.backend.triba.entities.Job;
 import com.backend.triba.entities.Location;
 import com.backend.triba.entities.Position;
 import com.backend.triba.entities.User;
 import com.backend.triba.entities.WorkType;
+import com.backend.triba.repository.ImageRepository;
 import com.backend.triba.repository.IndustryRepository;
 import com.backend.triba.repository.JobRepository;
 import com.backend.triba.repository.LocationRepository;
@@ -21,11 +29,16 @@ import com.backend.triba.repository.PositionRepository;
 import com.backend.triba.repository.UserRepository;
 import com.backend.triba.repository.WorkTypeRepository;
 
+import jakarta.persistence.criteria.Predicate;
+
 @Service
 public class JobService {
 
 	 @Autowired
 	    private JobRepository jobRepository;
+	 
+	 @Autowired
+	 private ImageRepository imageRepository;
 	 
 	 @Autowired
 	 private UserRepository userRepository;
@@ -65,40 +78,66 @@ public class JobService {
 	        User user = userRepository.findById(jobDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("User not found"));
 	        job.setUser(user);
 
-	        // Set industries
-	        List<Industry> industries = new ArrayList<>();
-	        for (Long id : jobDTO.getIndustryIds()) {
-	            Industry industry = industryRepository.findById(id).orElseThrow(() -> new RuntimeException("Industry not found"));
-	            industries.add(industry);
+	     // Set industries
+	        if (jobDTO.getIndustries() != null) {
+	            List<Industry> industries = new ArrayList<>();
+	            for (String name : jobDTO.getIndustries()) {
+	                Industry industry = industryRepository.findByName(name)
+	                        .orElseThrow(() -> new RuntimeException("Industry not found"));
+	                industries.add(industry);
+	            }
+	            job.setIndustries(industries);
 	        }
-	        job.setIndustries(industries);
 
 	        // Set positions
-	        List<Position> positions = new ArrayList<>();
-	        for (Long id : jobDTO.getPositionIds()) {
-	            Position position = positionRepository.findById(id).orElseThrow(() -> new RuntimeException("Position not found"));
-	            positions.add(position);
+	        if (jobDTO.getPositions() != null) {
+	            List<Position> positions = new ArrayList<>();
+	            for (String name : jobDTO.getPositions()) {
+	                Position position = positionRepository.findByName(name)
+	                        .orElseThrow(() -> new RuntimeException("Position not found"));
+	                positions.add(position);
+	            }
+	            job.setPositions(positions);
 	        }
-	        job.setPositions(positions);
 
 	        // Set locations
-	        List<Location> locations = new ArrayList<>();
-	        for (Long id : jobDTO.getLocationIds()) {
-	            Location location = locationRepository.findById(id).orElseThrow(() -> new RuntimeException("Location not found"));
-	            locations.add(location);
+	        if (jobDTO.getLocations() != null) {
+	            List<Location> locations = new ArrayList<>();
+	            for (String name : jobDTO.getLocations()) {
+	                Location location = locationRepository.findByName(name)
+	                        .orElseThrow(() -> new RuntimeException("Location not found"));
+	                locations.add(location);
+	            }
+	            job.setLocations(locations);
 	        }
-	        job.setLocations(locations);
 
 	        // Set work types
-	        List<WorkType> workTypes = new ArrayList<>();
-	        for (Long id : jobDTO.getWorkTypeIds()) {
-	            WorkType workType = workTypeRepository.findById(id).orElseThrow(() -> new RuntimeException("WorkType not found"));
-	            workTypes.add(workType);
+	        if (jobDTO.getWorkTypes() != null) {
+	            List<WorkType> workTypes = new ArrayList<>();
+	            for (String name : jobDTO.getWorkTypes()) {
+	                WorkType workType = workTypeRepository.findByName(name)
+	                        .orElseThrow(() -> new RuntimeException("WorkType not found"));
+	                workTypes.add(workType);
+	            }
+	            job.setWorkTypes(workTypes);
 	        }
-	        job.setWorkTypes(workTypes);
+	        
+	        job.setCreateAt(LocalDate.now());
+	        // Save job first
+	        Job savedJob = jobRepository.save(job);
+	      
+	     // Save images
+	        if (jobDTO.getImages() != null) {
+	            for (String imageUrl : jobDTO.getImages()) {
+	            	System.out.println("im: g: " + imageUrl);
+	                Image image = new Image();
+	                image.setUrl(imageUrl);
+	                image.setJob(savedJob);
+	                imageRepository.save(image);
+	            }
+	        }
 
-	        System.out.println("new job: " + job);
-	        return jobRepository.save(job);
+	        return savedJob;
 	    }
 	    
 	    public List<Job> getJobsByUser(UUID userId) {
@@ -122,7 +161,27 @@ public class JobService {
 	        return jobRepository.findByWorkType(workTypeName);
 	    }
 
-	    public List<Job> getJobsByMultipleCategories(String industryName, String positionName, String locationName, String workTypeName) {
-	        return jobRepository.findByMultipleCategories(industryName, positionName, locationName, workTypeName);
+	    public Page<Job> getJobsByMultipleCategories(String industryName, String positionName, String locationName, String workTypeName, int page, int size) {
+	        Specification<Job> spec = (root, query, criteriaBuilder) -> {
+	            Predicate predicate = criteriaBuilder.conjunction();
+
+	            if (StringUtils.hasText(industryName)) {
+	                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.join("industries").get("name"), industryName));
+	            }
+	            if (StringUtils.hasText(positionName)) {
+	                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.join("positions").get("name"), positionName));
+	            }
+	            if (StringUtils.hasText(locationName)) {
+	                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.join("locations").get("name"), locationName));
+	            }
+	            if (StringUtils.hasText(workTypeName)) {
+	                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.join("workTypes").get("name"), workTypeName));
+	            }
+
+	            return predicate;
+	        };
+
+	        Pageable pageable = PageRequest.of(page, size);
+	        return jobRepository.findAll(spec, pageable);
 	    }
 }

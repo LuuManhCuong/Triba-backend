@@ -2,11 +2,9 @@ package com.backend.triba.entities;
 
 import java.time.LocalDate;
 
-
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,11 +34,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "[user]")
-public class User implements UserDetails{
+public class User implements UserDetails {
 	@Id
-	@Column( unique = true, updatable = true)
+	@Column(unique = true, updatable = true)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private UUID userId;
+	
 	@Column(columnDefinition = "nvarchar(50)")
 	private String firstName;
 	@Column(columnDefinition = "nvarchar(50)")
@@ -70,20 +69,30 @@ public class User implements UserDetails{
 	private int taxCode;
 	private LocalDate createAt;
 	private LocalDate updatateAt;
-	
-	@OneToMany(mappedBy = "user" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Job> jobs;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL , fetch = FetchType.LAZY)
-	private List<Token> tokens;
 	
+	@JsonIgnore
+	 @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	    private List<JobApplication> jobApplications;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
+    private List<Comment> comments;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Token> tokens;
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
 		return List.of(new SimpleGrantedAuthority(role.name()));
 	}
+
 //	@Override
 //	public String getPassword() {
 //		// TODO Auto-generated method stub
@@ -94,26 +103,31 @@ public class User implements UserDetails{
 		// TODO Auto-generated method stub
 		return email;
 	}
+
 	@Override
 	public boolean isAccountNonExpired() {
 		// TODO Auto-generated method stub
 		return true;
 	}
+
 	@Override
 	public boolean isAccountNonLocked() {
 		// TODO Auto-generated method stub
 		return true;
 	}
+
 	@Override
 	public boolean isCredentialsNonExpired() {
 		// TODO Auto-generated method stub
 		return true;
 	}
+
 	@Override
 	public boolean isEnabled() {
 		// TODO Auto-generated method stub
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
@@ -124,7 +138,4 @@ public class User implements UserDetails{
 				+ ", updatateAt=" + updatateAt + "]";
 	}
 
-	
-
-	
 }

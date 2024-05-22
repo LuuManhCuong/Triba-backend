@@ -1,27 +1,30 @@
 package com.backend.triba.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import lombok.Data;
 
-@Entity
 @Data
+@Entity
 public class Comment {
-	@Id
-	@Column( unique = true, updatable = true)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID commentId;
-	private UUID ownerId;
-	private UUID userId;
-	@Column(columnDefinition = "ntext")
-	private String comment;
-	private LocalDate createdAt;
-	private LocalDate updatedAt;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "job_id")
+    private Job job;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(columnDefinition = "NTEXT")
+    private String content;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -1,8 +1,11 @@
 package com.backend.triba.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,18 +37,20 @@ public class JobControllers {
 	    return ResponseEntity.ok("Hello world");
 	}
 
-	@GetMapping
-	public ResponseEntity<List<Job>> getAllJobs() {
-	    List<Job> jobs = jobRepository.findAll();
-	    return ResponseEntity.ok(jobs);
-	}
+	 @GetMapping
+	    public ResponseEntity<Page<Job>> getAllJobs(Pageable pageable) {
+	        Page<Job> jobs = jobRepository.findAll(pageable);
+	        return ResponseEntity.ok(jobs);
+	    }
 	
 	@PostMapping("/add")
 	    public Job createJob(@RequestBody JobDTO jobDTO) {
+		
+		System.out.println("add: " + jobDTO);
 	        return jobService.saveJobWithDetails(jobDTO);
 	    }
 	
-	 @GetMapping("/user/{userId}")
+	 @GetMapping("/get/{userId}")
 	    public List<Job> getJobsByUser(@PathVariable UUID userId) {
 	        return jobService.getJobsByUser(userId);
 	    }
@@ -72,11 +77,20 @@ public class JobControllers {
 	    }
 
 	    @GetMapping("/filter")
-	    public List<Job> getJobsByMultipleCategories(
-	            @RequestParam(required = false) String industryName,
-	            @RequestParam(required = false) String positionName,
-	            @RequestParam(required = false) String locationName,
-	            @RequestParam(required = false) String workTypeName) {
-	        return jobService.getJobsByMultipleCategories(industryName, positionName, locationName, workTypeName);
+	    public Page<Job> getJobsByMultipleCategories(@RequestParam(required = false) String industryName,
+	                                                 @RequestParam(required = false) String positionName,
+	                                                 @RequestParam(required = false) String locationName,
+	                                                 @RequestParam(required = false) String workTypeName,
+	                                                 @RequestParam(defaultValue = "0") int page,
+	                                                 @RequestParam(defaultValue = "10") int size) {
+	        return jobService.getJobsByMultipleCategories(industryName, positionName, locationName, workTypeName, page, size);
+	    }
+	    
+	    
+//	    job detail
+	    @GetMapping("/{jobId}")
+	    public Optional<Job> getJobById(@PathVariable UUID jobId) {
+	       return jobRepository.findById(jobId);
+	       
 	    }
 }
