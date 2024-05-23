@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.backend.triba.entities.Job;
+import com.backend.triba.entities.User;
 public interface JobRepository extends JpaRepository<Job, UUID> {
 	
 	
@@ -54,5 +55,7 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
                                        Sort sort);
 
 	Page<Job> findAll(Specification<Job> spec, Pageable pageable);
+
+
 
 }

@@ -21,6 +21,7 @@ import com.backend.triba.entities.Location;
 import com.backend.triba.entities.Position;
 import com.backend.triba.entities.User;
 import com.backend.triba.entities.WorkType;
+import com.backend.triba.enums.JobStatus;
 import com.backend.triba.repository.ImageRepository;
 import com.backend.triba.repository.IndustryRepository;
 import com.backend.triba.repository.JobRepository;
@@ -30,6 +31,7 @@ import com.backend.triba.repository.UserRepository;
 import com.backend.triba.repository.WorkTypeRepository;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 
 @Service
 public class JobService {
@@ -73,7 +75,8 @@ public class JobService {
 	        job.setUpdateAt(jobDTO.getUpdateAt());
 	        job.setDeadline(jobDTO.getDeadline());
 	        job.setHastag(jobDTO.getHastag());
-
+	        job.setStatus(JobStatus.HIRING);
+	        
 	        // Set user
 	        User user = userRepository.findById(jobDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("User not found"));
 	        job.setUser(user);
@@ -160,6 +163,20 @@ public class JobService {
 	    public List<Job> getJobsByWorkType(String workTypeName) {
 	        return jobRepository.findByWorkType(workTypeName);
 	    }
+	    
+	    @Transactional
+	    public void deleteJobById(UUID jobId) {
+	        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+
+	        // Xóa rõ ràng các thực thể liên quan trước
+	        job.getIndustries().clear();
+	        job.getPositions().clear();
+	        job.getLocations().clear();
+	        job.getWorkTypes().clear();
+	        jobRepository.save(job);  // Lưu công việc để cập nhật các mối quan hệ
+
+	        jobRepository.deleteById(jobId);
+	    }
 
 	    public Page<Job> getJobsByMultipleCategories(String industryName, String positionName, String locationName, String workTypeName, int page, int size) {
 	        Specification<Job> spec = (root, query, criteriaBuilder) -> {
@@ -184,4 +201,5 @@ public class JobService {
 	        Pageable pageable = PageRequest.of(page, size);
 	        return jobRepository.findAll(spec, pageable);
 	    }
+
 }

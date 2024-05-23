@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import com.backend.triba.enums.JobStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -26,7 +27,7 @@ public class Job {
     private List<Comment> comments;
     
     @JsonIgnore
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<JobApplication> jobApplications;
 
     @Column(columnDefinition = "nvarchar(255)")
@@ -53,6 +54,7 @@ public class Job {
     private LocalDate updateAt;
     private LocalDate deadline;
     private String hastag;
+    private JobStatus status;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "Job_Industry", joinColumns = @JoinColumn(name = "jobId"), inverseJoinColumns = @JoinColumn(name = "industryId"))

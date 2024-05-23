@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,6 +50,22 @@ public class JobControllers {
 		System.out.println("add: " + jobDTO);
 	        return jobService.saveJobWithDetails(jobDTO);
 	    }
+	@DeleteMapping("/delete/{jobId}")
+    public ResponseEntity<Void> deleteJobById(@PathVariable UUID jobId) {
+        jobService.deleteJobById(jobId);
+        return ResponseEntity.noContent().build();
+    }
+	
+	
+//	@PostMapping("/update")
+//    public Job updateJob(@RequestBody JobDTO jobDTO) {
+//	
+//	System.out.println("add: " + jobDTO);
+//        return jobService.saveJobWithDetails(jobDTO);
+//    }
+
+	
+	
 	
 	 @GetMapping("/get/{userId}")
 	    public List<Job> getJobsByUser(@PathVariable UUID userId) {
