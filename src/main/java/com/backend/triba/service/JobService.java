@@ -3,6 +3,7 @@ package com.backend.triba.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.backend.triba.dto.JobDTO;
 import com.backend.triba.entities.Image;
 import com.backend.triba.entities.Industry;
 import com.backend.triba.entities.Job;
+import com.backend.triba.entities.JobApplication;
 import com.backend.triba.entities.Location;
 import com.backend.triba.entities.Position;
 import com.backend.triba.entities.User;
@@ -24,6 +26,7 @@ import com.backend.triba.entities.WorkType;
 import com.backend.triba.enums.JobStatus;
 import com.backend.triba.repository.ImageRepository;
 import com.backend.triba.repository.IndustryRepository;
+import com.backend.triba.repository.JobApplicationRepository;
 import com.backend.triba.repository.JobRepository;
 import com.backend.triba.repository.LocationRepository;
 import com.backend.triba.repository.PositionRepository;
@@ -56,6 +59,21 @@ public class JobService {
 
 	    @Autowired
 	    private WorkTypeRepository workTypeRepository;
+	    
+	    @Autowired
+	    private JobApplicationRepository jobApplicationRepository;
+	    
+	    public List<JobApplication> getJobApplicationsByJobId(UUID jobId) {
+	        return jobApplicationRepository.findByJobJobId(jobId);
+	    }
+	    
+	    
+	    public List<Job> getAllJobs() {
+	        return jobRepository.findAll();
+	    }
+	    public long getTotalJobs() {
+	        return jobRepository.count();
+	    }
 
 	 public Job saveJobWithDetails(JobDTO jobDTO) {
 	        Job job = new Job();
@@ -164,19 +182,111 @@ public class JobService {
 	        return jobRepository.findByWorkType(workTypeName);
 	    }
 	    
+	    
+	    // Method to update job status
+	    public void updateJobStatus(UUID jobId, JobStatus newStatus) {
+	        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+	        job.setStatus(newStatus);
+	        jobRepository.save(job);
+	    }
+	    
+	    
 	    @Transactional
 	    public void deleteJobById(UUID jobId) {
 	        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
 
 	        // Xóa rõ ràng các thực thể liên quan trước
-	        job.getIndustries().clear();
-	        job.getPositions().clear();
-	        job.getLocations().clear();
-	        job.getWorkTypes().clear();
+	        job.setIndustries(null);
+	        job.setPositions(null);
+	        job.setLocations(null);
+	        job.setWorkTypes(null);
+	        job.setUser(null);
 	        jobRepository.save(job);  // Lưu công việc để cập nhật các mối quan hệ
 
 	        jobRepository.deleteById(jobId);
 	    }
+	    
+	    public Job updateJob(UUID jobId, JobDTO jobDTO) {
+	        Optional<Job> optionalJob = jobRepository.findById(jobId);
+	        if (optionalJob.isPresent()) {
+	            Job existingJob = optionalJob.get();
+	            
+	            // Cập nhật các thuộc tính từ jobDTO
+	            existingJob.setTitle(jobDTO.getTitle());
+	            existingJob.setDescription(jobDTO.getDescription());
+	            existingJob.setThumbnail(jobDTO.getThumbnail());
+	            existingJob.setCompanyName(jobDTO.getCompanyName());
+	            existingJob.setLogo(jobDTO.getLogo());
+	            existingJob.setAddress(jobDTO.getAddress());
+	            existingJob.setSalary(jobDTO.getSalary());
+	            existingJob.setBudget(jobDTO.getBudget());
+	            existingJob.setQuantity(jobDTO.getQuantity());
+	            existingJob.setCategory(jobDTO.getCategory());
+	            existingJob.setDeadline(jobDTO.getDeadline());
+	            existingJob.setHastag(jobDTO.getHastag());
+	            existingJob.setStatus(jobDTO.getStatus());
+	            
+	            // Set industries
+	            if (jobDTO.getIndustries() != null) {
+	                List<Industry> industries = new ArrayList<>();
+	                for (String name : jobDTO.getIndustries()) {
+	                    Industry industry = industryRepository.findByName(name)
+	                            .orElseThrow(() -> new RuntimeException("Industry not found"));
+	                    industries.add(industry);
+	                }
+	                existingJob.setIndustries(industries);
+	            }
+
+	            // Set positions
+	            if (jobDTO.getPositions() != null) {
+	                List<Position> positions = new ArrayList<>();
+	                for (String name : jobDTO.getPositions()) {
+	                    Position position = positionRepository.findByName(name)
+	                            .orElseThrow(() -> new RuntimeException("Position not found"));
+	                    positions.add(position);
+	                }
+	                existingJob.setPositions(positions);
+	            }
+
+	            // Set locations
+	            if (jobDTO.getLocations() != null) {
+	                List<Location> locations = new ArrayList<>();
+	                for (String name : jobDTO.getLocations()) {
+	                    Location location = locationRepository.findByName(name)
+	                            .orElseThrow(() -> new RuntimeException("Location not found"));
+	                    locations.add(location);
+	                }
+	                existingJob.setLocations(locations);
+	            }
+
+	            // Set work types
+	            if (jobDTO.getWorkTypes() != null) {
+	                List<WorkType> workTypes = new ArrayList<>();
+	                for (String name : jobDTO.getWorkTypes()) {
+	                    WorkType workType = workTypeRepository.findByName(name)
+	                            .orElseThrow(() -> new RuntimeException("WorkType not found"));
+	                    workTypes.add(workType);
+	                }
+	                existingJob.setWorkTypes(workTypes);
+	            }
+	            
+	            // Update images
+	            if (jobDTO.getImages() != null) {
+	                for (String imageUrl : jobDTO.getImages()) {
+	                    Image image = new Image();
+	                    image.setUrl(imageUrl);
+	                    image.setJob(existingJob);
+	                    imageRepository.save(image);
+	                }
+	            }
+	            
+	            return jobRepository.save(existingJob);
+	        } else {
+	            return null;
+	        }
+	    }
+
+	    
 
 	    public Page<Job> getJobsByMultipleCategories(String industryName, String positionName, String locationName, String workTypeName, int page, int size) {
 	        Specification<Job> spec = (root, query, criteriaBuilder) -> {

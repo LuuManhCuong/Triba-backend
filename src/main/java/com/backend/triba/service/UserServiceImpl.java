@@ -28,5 +28,9 @@ public class UserServiceImpl implements UserService {
 			}
 		};
 	};
+	
+	  public long getTotalUsers() {
+	        return userRepository.count();
+	    }
 
 }

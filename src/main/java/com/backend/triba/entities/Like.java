@@ -2,30 +2,29 @@ package com.backend.triba.entities;
 
 import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
-@Entity
 @Data
+@Entity
 @Table(name = "[like]")
 public class Like {
-	@Id
-	@Column( unique = true, updatable = true)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID likeId;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "job_id")
-    private Job job;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID likeId;
 
+//    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "job_id")
+    private Job job;
+
+    // Các trường khác có thể thêm vào nếu cần
 }

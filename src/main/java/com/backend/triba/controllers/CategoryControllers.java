@@ -16,7 +16,6 @@ import com.backend.triba.repository.WorkTypeRepository;
 
 import java.util.List;
 import java.util.Map;
-
 @RestController
 @RequestMapping("/api")
 public class CategoryControllers {
@@ -29,38 +28,48 @@ public class CategoryControllers {
     private LocationRepository locationRepository;
     @Autowired
     private WorkTypeRepository workTypeRepository;
-    
+
     @PostMapping("/categories")
-    public ResponseEntity<String> addCategories(@RequestBody Map<String, Map<String, List<String>>> categories) {
-        Map<String, List<String>> categoryMap = categories.get("categories");
+    public ResponseEntity<String> addCategories(@RequestBody Map<String, Map<String, Object>> categories) {
+        Map<String, Object> categoryMap = categories.get("categories");
 
         if (categoryMap != null) {
             categoryMap.forEach((key, values) -> {
-                values.forEach(value -> {
-                    switch (key) {
-                        case "industries":
+                switch (key) {
+                    case "industries":
+                        List<String> industries = (List<String>) values;
+                        industries.forEach(value -> {
                             Industry industry = new Industry();
                             industry.setName(value);
                             industryRepository.save(industry);
-                            break;
-                        case "positions":
+                        });
+                        break;
+                    case "positions":
+                        List<String> positions = (List<String>) values;
+                        positions.forEach(value -> {
                             Position position = new Position();
                             position.setName(value);
                             positionRepository.save(position);
-                            break;
-                        case "locations":
+                        });
+                        break;
+                    case "locations":
+                        List<Map<String, String>> locations = (List<Map<String, String>>) values;
+                        locations.forEach(locationData -> {
                             Location location = new Location();
-                            location.setName(value);
+                            location.setName(locationData.get("name"));
+                            location.setThumbnail(locationData.get("thumbnail"));
                             locationRepository.save(location);
-                            break;
-                        case "workTypes":
+                        });
+                        break;
+                    case "workTypes":
+                        List<String> workTypes = (List<String>) values;
+                        workTypes.forEach(value -> {
                             WorkType workType = new WorkType();
                             workType.setName(value);
                             workTypeRepository.save(workType);
-                            break;
-                        
-                    }
-                });
+                        });
+                        break;
+                }
             });
             return new ResponseEntity<>("Categories added successfully", HttpStatus.OK);
         } else {

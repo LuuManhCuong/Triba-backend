@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -74,6 +75,10 @@ public class User implements UserDetails {
 	@JsonIgnore
 	private List<Job> jobs;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Like> likes;
+
 	
 	@JsonIgnore
 	 @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,16 +57,17 @@ public class JobControllers {
         return ResponseEntity.noContent().build();
     }
 	
-	
-//	@PostMapping("/update")
-//    public Job updateJob(@RequestBody JobDTO jobDTO) {
-//	
-//	System.out.println("add: " + jobDTO);
-//        return jobService.saveJobWithDetails(jobDTO);
-//    }
 
 	
-	
+	@PutMapping("/update/{jobId}")
+	public ResponseEntity<Job> updateJob(@PathVariable UUID jobId, @RequestBody JobDTO jobDTO) {
+	    Job updatedJob = jobService.updateJob(jobId, jobDTO);
+	    if (updatedJob != null) {
+	        return ResponseEntity.ok(updatedJob);
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
+	}
 	
 	 @GetMapping("/get/{userId}")
 	    public List<Job> getJobsByUser(@PathVariable UUID userId) {

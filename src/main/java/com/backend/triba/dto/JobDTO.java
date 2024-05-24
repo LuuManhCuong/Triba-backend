@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.backend.triba.entities.Image;
+import com.backend.triba.enums.JobStatus;
 
 import lombok.Data;
 
@@ -26,6 +27,7 @@ public class JobDTO {
     private LocalDate updateAt;
     private LocalDate deadline;
     private String hastag;
+    private JobStatus status;
     private List<String> industries;
     private List<String> positions;
     private List<String> locations;

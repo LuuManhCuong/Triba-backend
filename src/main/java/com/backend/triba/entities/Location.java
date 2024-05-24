@@ -26,6 +26,9 @@ public class Location {
     @Column(name = "name", columnDefinition = "NVARCHAR(255)")
     private String name;
     
+    @Column(name = "thumbnail", columnDefinition = "ntext")
+    private String thumbnail;
+    
     @ManyToMany(mappedBy = "locations")
     @JsonIgnore
     private List<Job> jobs;
