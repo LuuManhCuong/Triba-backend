@@ -23,7 +23,7 @@ public class UserConverter {
 		result.setEmail(user.getEmail());
 		result.setFirstName(user.getFirstName());
 		result.setLastName(user.getLastName());
-		result.setPhone(user.getPhoneNumber());
+		result.setPhoneNumber(user.getPhoneNumber());
 		
 		result.setRole(user.getRole());
 		result.setAvatar(user.getAvatar());
@@ -36,7 +36,7 @@ public class UserConverter {
 		user.setFirstName(Optional.ofNullable(userDTO.getFirstName()).orElse(user.getFirstName()));
 		user.setLastName(Optional.ofNullable(userDTO.getLastName()).orElse(user.getLastName()));
 		user.setEmail(Optional.ofNullable(userDTO.getEmail()).orElse(user.getEmail()));
-		user.setPhoneNumber(Optional.ofNullable(userDTO.getPhone()).orElse(user.getPhoneNumber()));
+		user.setPhoneNumber(Optional.ofNullable(userDTO.getPhoneNumber()).orElse(user.getPhoneNumber()));
 		user.setAvatar(Optional.ofNullable(userDTO.getAvatar()).orElse(user.getAvatar()));
 		user.setAvatar(Optional.ofNullable(userDTO.getAvatar()).orElse(user.getAvatar()));
 		user.setRole(Optional.ofNullable(userDTO.getRole()).orElse(user.getRole()));

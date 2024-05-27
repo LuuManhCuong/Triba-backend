@@ -19,9 +19,15 @@ public class UserDTO {
 	private String email;
 	private String firstName;
 	private String lastName;
-	private String phone;
-	private String addres;
+	private String phoneNumber;
+	
+	private String address;
 	private String avatar;
+	private String coverImg;
+	private String slogan;
+	private String education;
+	private String experience;
+	private String password;
 	private Roles role;
 	private LocalDate updateAt;
 	private LocalDate createAt;

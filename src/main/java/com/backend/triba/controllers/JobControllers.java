@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,86 +31,101 @@ import com.backend.triba.service.JobService;
 public class JobControllers {
 	@Autowired
 	private JobRepository jobRepository;
-	
+
 	@Autowired
 	private JobService jobService;
-	
+
 	@GetMapping("/hello")
 	public ResponseEntity<String> sayhello() {
-	    return ResponseEntity.ok("Hello world");
+		return ResponseEntity.ok("Hello world");
 	}
 
-	 @GetMapping
-	    public ResponseEntity<Page<Job>> getAllJobs(Pageable pageable) {
-	        Page<Job> jobs = jobRepository.findAll(pageable);
-	        return ResponseEntity.ok(jobs);
-	    }
-	
+	@GetMapping
+	public ResponseEntity<Page<Job>> getAllJobs(Pageable pageable) {
+		Page<Job> jobs = jobRepository.findAll(pageable);
+		return ResponseEntity.ok(jobs);
+	}
+
 	@PostMapping("/add")
-	    public Job createJob(@RequestBody JobDTO jobDTO) {
-		
+	public Job createJob(@RequestBody JobDTO jobDTO) {
 		System.out.println("add: " + jobDTO);
-	        return jobService.saveJobWithDetails(jobDTO);
-	    }
-	@DeleteMapping("/delete/{jobId}")
-    public ResponseEntity<Void> deleteJobById(@PathVariable UUID jobId) {
-        jobService.deleteJobById(jobId);
-        return ResponseEntity.noContent().build();
-    }
-	
+		return jobService.saveJobWithDetails(jobDTO);
+	}
+
+//	add multiple jobs
+	@PostMapping("/addMultiple")
+	public ResponseEntity<String>  createMultipleJobs(@RequestBody List<JobDTO> jobDTOs) {
+		System.out.println("add jobs");
+		for (JobDTO jobDTO : jobDTOs) {
+			jobService.saveJobWithDetails(jobDTO);
+			
+		}
+		 return new ResponseEntity<>("Jobs added successfully", HttpStatus.OK);
+	}
 
 	
+	
+	@DeleteMapping("/delete/{jobId}")
+	public ResponseEntity<Void> deleteJobById(@PathVariable UUID jobId) {
+		jobService.deleteJobById(jobId);
+		return ResponseEntity.noContent().build();
+	}
+
 	@PutMapping("/update/{jobId}")
 	public ResponseEntity<Job> updateJob(@PathVariable UUID jobId, @RequestBody JobDTO jobDTO) {
-	    Job updatedJob = jobService.updateJob(jobId, jobDTO);
-	    if (updatedJob != null) {
-	        return ResponseEntity.ok(updatedJob);
-	    } else {
-	        return ResponseEntity.notFound().build();
-	    }
+		Job updatedJob = jobService.updateJob(jobId, jobDTO);
+		if (updatedJob != null) {
+			return ResponseEntity.ok(updatedJob);
+		} else {
+			return ResponseEntity.notFound().build();
+		}
 	}
-	
-	 @GetMapping("/get/{userId}")
-	    public List<Job> getJobsByUser(@PathVariable UUID userId) {
-	        return jobService.getJobsByUser(userId);
-	    }
 
-	    @GetMapping("/industry")
-	    public List<Job> getJobsByIndustry(@RequestParam String industryName) {
-	    	System.out.println("filter industry: "+ industryName);
-	        return jobService.getJobsByIndustry(industryName);
-	    }
+	@GetMapping("/get/{userId}")
+	public List<Job> getJobsByUser(@PathVariable UUID userId) {
+		return jobService.getJobsByUser(userId);
+	}
 
-	    @GetMapping("/position")
-	    public List<Job> getJobsByPosition(@RequestParam String positionName) {
-	        return jobService.getJobsByPosition(positionName);
-	    }
+	@GetMapping("/industry")
+	public List<Job> getJobsByIndustry(@RequestParam String industryName) {
+		System.out.println("filter industry: " + industryName);
+		return jobService.getJobsByIndustry(industryName);
+	}
 
-	    @GetMapping("/location")
-	    public List<Job> getJobsByLocation(@RequestParam String locationName) {
-	        return jobService.getJobsByLocation(locationName);
-	    }
+	@GetMapping("/position")
+	public List<Job> getJobsByPosition(@RequestParam String positionName) {
+		return jobService.getJobsByPosition(positionName);
+	}
 
-	    @GetMapping("/worktype")
-	    public List<Job> getJobsByWorkType(@RequestParam String workTypeName) {
-	        return jobService.getJobsByWorkType(workTypeName);
-	    }
+	@GetMapping("/location")
+	public List<Job> getJobsByLocation(@RequestParam String locationName) {
+		return jobService.getJobsByLocation(locationName);
+	}
 
-	    @GetMapping("/filter")
-	    public Page<Job> getJobsByMultipleCategories(@RequestParam(required = false) String industryName,
-	                                                 @RequestParam(required = false) String positionName,
-	                                                 @RequestParam(required = false) String locationName,
-	                                                 @RequestParam(required = false) String workTypeName,
-	                                                 @RequestParam(defaultValue = "0") int page,
-	                                                 @RequestParam(defaultValue = "10") int size) {
-	        return jobService.getJobsByMultipleCategories(industryName, positionName, locationName, workTypeName, page, size);
-	    }
-	    
-	    
+	@GetMapping("/worktype")
+	public List<Job> getJobsByWorkType(@RequestParam String workTypeName) {
+		return jobService.getJobsByWorkType(workTypeName);
+	}
+
+	@GetMapping("/filter")
+	public Page<Job> getJobsByMultipleCategories(@RequestParam(required = false) String industryName,
+			@RequestParam(required = false) String positionName, @RequestParam(required = false) String locationName,
+			@RequestParam(required = false) String workTypeName, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+		return jobService.getJobsByMultipleCategories(industryName, positionName, locationName, workTypeName, page,
+				size);
+	}
+
 //	    job detail
-	    @GetMapping("/{jobId}")
-	    public Optional<Job> getJobById(@PathVariable UUID jobId) {
-	       return jobRepository.findById(jobId);
-	       
-	    }
+	@GetMapping("/{jobId}")
+	public Optional<Job> getJobById(@PathVariable UUID jobId) {
+		return jobRepository.findById(jobId);
+
+	}
+
+	@GetMapping("/search")
+	public List<Job> searchJobs(@RequestParam String keyword) {
+		System.out.println("search: " + keyword);
+		return jobService.searchJobs(keyword);
+	}
 }

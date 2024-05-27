@@ -60,7 +60,7 @@ public class User implements UserDetails {
 	private long point;
 	private String coverImg;
 	@Column(columnDefinition = "ntext")
-	private String sologan;
+	private String slogan;
 	@Column(columnDefinition = "nvarchar(255)")
 	private String address;
 	private String scale;
@@ -71,25 +71,25 @@ public class User implements UserDetails {
 	private LocalDate createAt;
 	private LocalDate updatateAt;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Job> jobs;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<Like> likes;
 
 	
 	@JsonIgnore
-	 @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	 @OneToMany(mappedBy = "user",  fetch = FetchType.LAZY)
 	    private List<JobApplication> jobApplications;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user",  fetch = FetchType.LAZY)
 	@JsonIgnore
     private List<Comment> comments;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user",  fetch = FetchType.LAZY)
 	private List<Token> tokens;
 
 	@Override
@@ -138,7 +138,7 @@ public class User implements UserDetails {
 		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
 				+ ", role=" + role + ", gender=" + gender + ", education=" + education + ", experience=" + experience
 				+ ", skill=" + skill + ", avatar=" + avatar + ", phoneNumber=" + phoneNumber + ", point=" + point
-				+ ", coverImg=" + coverImg + ", sologan=" + sologan + ", address=" + address + ", scale=" + scale
+				+ ", coverImg=" + coverImg + ", slogan=" + slogan + ", address=" + address + ", scale=" + scale
 				+ ", industry=" + industry + ", website=" + website + ", taxCode=" + taxCode + ", createAt=" + createAt
 				+ ", updatateAt=" + updatateAt + "]";
 	}

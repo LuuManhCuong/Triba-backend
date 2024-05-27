@@ -59,6 +59,9 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
 
 	Page<Job> findAll(Specification<Job> spec, Pageable pageable);
 
+	 @Query(value = "SELECT * FROM job WHERE (title COLLATE SQL_Latin1_General_CP1_CI_AI LIKE %:keyword% )", nativeQuery = true)
+	    List<Job> findByTitleIgnoreCase(String keyword);
+
 
 
 }

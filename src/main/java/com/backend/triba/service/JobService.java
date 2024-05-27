@@ -161,6 +161,7 @@ public class JobService {
 	        return savedJob;
 	    }
 	    
+	 
 	    public List<Job> getJobsByUser(UUID userId) {
 	        return jobRepository.findAllByUserId(userId);
 	    }
@@ -193,6 +194,7 @@ public class JobService {
 	    
 	    @Transactional
 	    public void deleteJobById(UUID jobId) {
+	    	
 	        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
 
 	        // Xóa rõ ràng các thực thể liên quan trước
@@ -310,6 +312,11 @@ public class JobService {
 
 	        Pageable pageable = PageRequest.of(page, size);
 	        return jobRepository.findAll(spec, pageable);
+	    }
+
+
+	    public List<Job> searchJobs(String keyword) {
+	        return jobRepository.findByTitleIgnoreCase(keyword);
 	    }
 
 }

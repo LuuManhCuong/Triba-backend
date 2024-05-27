@@ -31,6 +31,7 @@ import com.backend.triba.dto.RefreshTokenRequestDTO;
 import com.backend.triba.dto.SigUpRequestDTO;
 import com.backend.triba.dto.SiginRequestDTO;
 import com.backend.triba.dto.SignInResponse;
+import com.backend.triba.dto.UserDTO;
 import com.backend.triba.entities.Token;
 import com.backend.triba.entities.User;
 import com.backend.triba.enums.Roles;
@@ -288,10 +289,10 @@ public class AuthenticationService implements UserDetailsService {
 	 * @param newPassword
 	 * @return
 	 */
-	public SignInResponse changePassword(String username, String newPassword) {
+	public SignInResponse changePassword(UUID userId, String newPassword) {
 		//Tìm kiếm người dùng trong cơ sở dữ liệu dựa trên email.
 		//Nếu không tìm thấy người dùng, ném một NoSuchElementException.
-		User user = userRepository.findByEmail(username);
+		User user = userRepository.findByUserId(userId);
 		
 		//Thiết lập mật khẩu mới cho người dùng, sau khi mã hóa mật khẩu mới.
 		user.setPassword(bcryptEncoder.encode(newPassword));
@@ -313,5 +314,52 @@ public class AuthenticationService implements UserDetailsService {
 				.build();
 	}
 	
+	
+	 public SignInResponse updateUser(UUID userId, UserDTO requestDTO) {
+	        User existingUser = userRepository.findById(userId).orElse(null);
+	        User checkEmailUser = userrepository.findByEmail(requestDTO.getEmail());
+	        if(checkEmailUser.getUserId() != existingUser.getUserId()) {
+	        	return SignInResponse.builder()
+	    				.message("Email đã tồn tại!")
+	    				.build();
+	        }
+	        if (existingUser != null) {
+	            // Cập nhật thông tin người dùng từ requestDTO
+	        	existingUser.setPassword(bcryptEncoder.encode(requestDTO.getPassword()));
+	        	existingUser.setUpdatateAt(LocalDate.now());
+	            existingUser.setFirstName(requestDTO.getFirstName());
+	            existingUser.setLastName(requestDTO.getLastName());
+	            existingUser.setEmail(requestDTO.getEmail());
+	            existingUser.setSlogan(requestDTO.getSlogan());
+	            existingUser.setAddress(requestDTO.getAddress());
+	            existingUser.setAvatar(requestDTO.getAvatar());
+	            existingUser.setCoverImg(requestDTO.getCoverImg());
+	            existingUser.setPhoneNumber(requestDTO.getPhoneNumber());
+	            existingUser.setEducation(requestDTO.getEducation());
+	            existingUser.setExperience(requestDTO.getExperience());
+	            // Các thông tin cập nhật khác...
+	            
+	            
+	            System.out.print("update User: "+ existingUser);
+	            // Lưu thay đổi vào cơ sở dữ liệu
+	            userRepository.save(existingUser);
+	            
+	    		
+	    		var jwtToken = jwtService.generateToken(existingUser);//tạo accesstoken mới
+	    		var refreshToken = jwtService.generateRefreshToken(existingUser);//tạo refreshToken mới
+	    		
+	        	//Tìm và hủy tất cả các token đang hoạt động của user này
+	    		revokeAllUserTokens(existingUser);
+	    		
+	    		saveUserToken(existingUser, jwtToken, refreshToken);//lưu token vào db
+	    		return SignInResponse.builder()
+	    				.accessToken(jwtToken)
+	    				.refreshToken(refreshToken)
+	    				.user(userConverter.toDTO(existingUser))
+	    				.message("Cập nhật thành công!")
+	    				.build();
+	        }
+	        return null;
+	    }
 	
 }
