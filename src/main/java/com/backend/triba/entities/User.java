@@ -84,9 +84,14 @@ public class User implements UserDetails {
 	 @OneToMany(mappedBy = "user",  fetch = FetchType.LAZY)
 	    private List<JobApplication> jobApplications;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "user",  fetch = FetchType.LAZY)
+    private List<Comment> comments;
+	
 	@OneToMany(mappedBy = "user",  fetch = FetchType.LAZY)
 	@JsonIgnore
-    private List<Comment> comments;
+    private List<Search> searchs;
+
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "user",  fetch = FetchType.LAZY)

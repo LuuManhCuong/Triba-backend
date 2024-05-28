@@ -45,6 +45,15 @@ public class JobControllers {
 		Page<Job> jobs = jobRepository.findAll(pageable);
 		return ResponseEntity.ok(jobs);
 	}
+	
+	
+	@GetMapping("/get-all")
+	public ResponseEntity<List<Job>> getAll() {
+		List<Job> jobs = jobRepository.findAll();
+		return ResponseEntity.ok(jobs);
+	}
+	
+	
 
 	@PostMapping("/add")
 	public Job createJob(@RequestBody JobDTO jobDTO) {

@@ -62,6 +62,8 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
 	 @Query(value = "SELECT * FROM job WHERE (title COLLATE SQL_Latin1_General_CP1_CI_AI LIKE %:keyword% )", nativeQuery = true)
 	    List<Job> findByTitleIgnoreCase(String keyword);
 
+	void deleteByJobId(UUID jobId);
+
 
 
 }

@@ -11,7 +11,7 @@ import lombok.Data;
 @Entity
 public class Comment {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
@@ -20,11 +20,13 @@ public class Comment {
     private Job job;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id") // Đặt referencedColumnName để chỉ định cột tham chiếu trong bảng user
     private User user;
 
     @Column(columnDefinition = "NTEXT")
     private String content;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    
+    
 }

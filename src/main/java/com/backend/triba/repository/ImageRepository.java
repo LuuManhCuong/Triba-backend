@@ -1,5 +1,6 @@
 package com.backend.triba.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,6 @@ import com.backend.triba.entities.Job;
 public interface ImageRepository extends JpaRepository<Image, UUID> {
 
 	void deleteAllByJob(Job existingJob);
+
+	List<Image> findByJobJobId(UUID jobId);
 }

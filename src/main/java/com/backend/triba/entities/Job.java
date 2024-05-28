@@ -24,9 +24,10 @@ public class Job {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
+    @OneToMany(mappedBy = "job",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Comment> comments;
+
     
     
 //    @JsonIgnore

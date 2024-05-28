@@ -9,17 +9,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
 
+import com.backend.triba.dto.RecommendDataDTO;
 import com.backend.triba.dto.SignInResponse;
 import com.backend.triba.dto.UserDTO;
+import com.backend.triba.entities.Job;
+import com.backend.triba.entities.Search;
 import com.backend.triba.entities.User;
 import com.backend.triba.enums.Roles;
+import com.backend.triba.repository.JobRepository;
 import com.backend.triba.repository.UserRepository;
 import com.backend.triba.service.AuthenticationService;
+import com.backend.triba.service.SearchService;
 import com.backend.triba.service.UserServiceImpl;
+import com.google.common.base.Optional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +40,30 @@ public class UserController {
     private UserRepository userRepository;
     
     @Autowired
+    private JobRepository jobRepository;
+    
+    @Autowired 
+    private SearchService searchService;
+    
+    @Autowired
     private AuthenticationService authenticationService;
+    
+    
+//    recommendDataDTO
+    @GetMapping("/recommen/data/{userId}")
+    public ResponseEntity<?> recommendData(@PathVariable UUID userId) {
+    	List<Job> jobs = jobRepository.findAll();
+    	 // Lấy thông tin tìm kiếm theo userId
+        Optional<Search> searchOptional = searchService.findByUserId(userId);
+        if (searchOptional.isPresent()) {
+        	RecommendDataDTO  recommendDataDTO = new RecommendDataDTO();
+        	recommendDataDTO.setListJob(jobs);
+        	recommendDataDTO.setPersonalData(searchOptional.get());
+            return ResponseEntity.ok(recommendDataDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @PatchMapping("/update/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable UUID userId, @RequestBody UserDTO requestDTO) {
