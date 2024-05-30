@@ -66,4 +66,5 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
 
 
 
+
 }

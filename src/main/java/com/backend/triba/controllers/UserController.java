@@ -123,5 +123,17 @@ public class UserController {
 
         return ResponseEntity.ok("Vai trò của người dùng đã được thay đổi thành công thành: " + newRole);
     }
+    
+    
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
+        User existingUser = userService.getUserById(userId);
+        if (existingUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy người dùng với ID: " + userId);
+        }
+
+        userService.deleteUserById(userId);
+        return ResponseEntity.ok("Người dùng với ID: " + userId + " đã được xóa thành công.");
+    }
 
 }

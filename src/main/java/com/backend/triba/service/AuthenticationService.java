@@ -5,9 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.backend.triba.converter.UserConverter;
-import com.backend.triba.dto.JwtAuthenticationResponse;
-import com.backend.triba.dto.RefreshTokenRequestDTO;
 import com.backend.triba.dto.SigUpRequestDTO;
 import com.backend.triba.dto.SiginRequestDTO;
 import com.backend.triba.dto.SignInResponse;
@@ -36,18 +32,13 @@ import com.backend.triba.entities.Token;
 import com.backend.triba.entities.User;
 import com.backend.triba.enums.Roles;
 import com.backend.triba.enums.TokenType;
-import com.backend.triba.interfaces.IAuthenticationService;
 import com.backend.triba.repository.TokenRepository;
 import com.backend.triba.repository.UserRepository;
 
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 @Service
@@ -140,31 +131,31 @@ public class AuthenticationService implements UserDetailsService {
 		System.out.println( "check user: " + user);
 		
 		if(user== null) {
+			throw new RuntimeException("Không tìm thấy tài khoản này, vui lòng nhập lại!");
+		}
+		else {
+
+			//Tìm và hủy tất cả các token đang hoạt động của user này
+			//(đảm bảo chỉ duy nhất 1 token hoạt động)
+			revokeAllUserTokens(user);
+			
+			var jwtToken = jwtService.generateToken(user);//Tạo refreshToken
+			var refreshToken = jwtService.generateRefreshToken(user); //lưu token vào db
+			
+			authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+			
+			
+			
+			saveUserToken(user, jwtToken, refreshToken); //Lưu token mới vào db
 			return SignInResponse.builder()
-					.message("Không tìm thấy tài khoản này, vui lòng nhập lại!")
+					.accessToken(jwtToken)
+					.refreshToken(refreshToken)
+					.message("Đăng nhập thành công")
+					.user(userConverter.toDTO(user))
 					.build();
 		}
 		
-		
-		//Tìm và hủy tất cả các token đang hoạt động của user này
-		//(đảm bảo chỉ duy nhất 1 token hoạt động)
-		revokeAllUserTokens(user);
-		
-		var jwtToken = jwtService.generateToken(user);//Tạo refreshToken
-		var refreshToken = jwtService.generateRefreshToken(user); //lưu token vào db
-		
-		authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-		
-		
-		
-		saveUserToken(user, jwtToken, refreshToken); //Lưu token mới vào db
-		return SignInResponse.builder()
-				.accessToken(jwtToken)
-				.refreshToken(refreshToken)
-				.message("Đăng nhập thành công")
-				.user(userConverter.toDTO(user))
-				.build();
 	}
 	
 	 @Transactional

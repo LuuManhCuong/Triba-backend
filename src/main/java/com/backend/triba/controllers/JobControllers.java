@@ -45,15 +45,12 @@ public class JobControllers {
 		Page<Job> jobs = jobRepository.findAll(pageable);
 		return ResponseEntity.ok(jobs);
 	}
-	
-	
+
 	@GetMapping("/get-all")
 	public ResponseEntity<List<Job>> getAll() {
 		List<Job> jobs = jobRepository.findAll();
 		return ResponseEntity.ok(jobs);
 	}
-	
-	
 
 	@PostMapping("/add")
 	public Job createJob(@RequestBody JobDTO jobDTO) {
@@ -63,17 +60,15 @@ public class JobControllers {
 
 //	add multiple jobs
 	@PostMapping("/addMultiple")
-	public ResponseEntity<String>  createMultipleJobs(@RequestBody List<JobDTO> jobDTOs) {
+	public ResponseEntity<String> createMultipleJobs(@RequestBody List<JobDTO> jobDTOs) {
 		System.out.println("add jobs");
 		for (JobDTO jobDTO : jobDTOs) {
 			jobService.saveJobWithDetails(jobDTO);
-			
+
 		}
-		 return new ResponseEntity<>("Jobs added successfully", HttpStatus.OK);
+		return new ResponseEntity<>("Jobs added successfully", HttpStatus.OK);
 	}
 
-	
-	
 	@DeleteMapping("/delete/{jobId}")
 	public ResponseEntity<Void> deleteJobById(@PathVariable UUID jobId) {
 		jobService.deleteJobById(jobId);
@@ -117,11 +112,18 @@ public class JobControllers {
 	}
 
 	@GetMapping("/filter")
-	public Page<Job> getJobsByMultipleCategories(@RequestParam(required = false) String industryName,
-			@RequestParam(required = false) String positionName, @RequestParam(required = false) String locationName,
-			@RequestParam(required = false) String workTypeName, @RequestParam(defaultValue = "0") int page,
+	public Page<Job> getJobsByMultipleCategories(
+			@RequestParam(required = false) String industryName,
+			@RequestParam(required = false) String positionName, 
+			@RequestParam(required = false) String locationName,
+			@RequestParam(required = false) String workTypeName, 
+			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
-		return jobService.getJobsByMultipleCategories(industryName, positionName, locationName, workTypeName, page,
+		return jobService.getJobsByMultipleCategories(industryName,
+				positionName, 
+				locationName, 
+				workTypeName,
+				page,
 				size);
 	}
 

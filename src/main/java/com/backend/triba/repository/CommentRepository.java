@@ -24,4 +24,6 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 	
 	void deleteByJobJobId(UUID jobId);
 
+	List<Comment> findByUser_UserId(UUID userId);
+
 }

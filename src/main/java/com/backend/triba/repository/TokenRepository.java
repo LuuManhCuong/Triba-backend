@@ -34,4 +34,7 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
 	Optional<Token> findByToken(String token);
 	
 	Optional<Token> findByRefreshToken(String refreshToken);
+
+
+	List<Token> findByUser_UserId(UUID userId);
 }

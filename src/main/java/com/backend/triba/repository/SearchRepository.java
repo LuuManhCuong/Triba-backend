@@ -1,5 +1,6 @@
 package com.backend.triba.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,7 @@ public interface SearchRepository extends JpaRepository<Search, UUID> {
 
 
 	Optional<Search> findByUserUserId(UUID userId);
+
+	List<Search> findByUser_UserId(UUID userId);
 
 }
